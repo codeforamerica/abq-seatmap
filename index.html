@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='utf-8'>
+	<meta http-equiv="X-UA-Compatible" content="chrome=1">
+	<meta name="viewport" content="width=640">
+	
+	<title>ABQ SeatMap</title>
+	
+	<style>
+		svg .desk { fill: white; stroke: black; }
+		svg .desk.available { fill: lightgreen; }
+		svg .desk.occupied  { fill: lightgray; }
+		svg .desk:hover { opacity: 0.5; }
+	</style>
+</head>
+
+<body>
+	<object id="office" data="images/office.svg" type="image/svg+xml"></object>
+	
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+<script>
+var SEATS = [
+	{
+		"id": "desk_1",
+		"cost": 250,
+		"status": "occupied",
+		"occupant": {
+			"name": "John",
+			"website": "www.example.biz",
+			"skills": [
+				"Ruby on Rails",
+				"Design",
+				"jQuery"
+			]
+		}
+	},
+	{
+		"id": "desk_2",
+		"cost": 350,
+		"status": "available"
+	},
+	{
+		"id": "desk_3",
+		"cost": 400,
+		"status": "available"
+	},
+	{
+		"id": "desk_4",
+		"cost": 350,
+		"status": "occupied",
+		"occupant": {
+			"name": "Meredith",
+			"website": "www.example.biz",
+			"skills": [
+				"Ruby on Rails",
+				"Design",
+				"jQuery"
+			]
+		}
+	}
+];
+</script>
+
+<script>
+jQuery(window).on('load', function() {
+	var $ = jQuery;
+	var $body = $('body');
+	var $obj = $('#office');
+	var doc = $obj[0].contentDocument;
+	var $svg = $(doc).children('svg');
+	$body.append($svg);
+	$obj.remove();
+	
+	// TODO: find a more compatible way to addClass to svg
+	// http://keith-wood.name/svg.html#dom
+	// https://github.com/toddmotto/lunar
+	
+	var classNames = {
+		"available": "available",
+		"occupied": "occupied"
+	};
+	
+	for (var i=0, l=SEATS.length; i<l; i++) {
+		var desk = SEATS[i];
+		var $desk = $svg.find('#'+desk.id);
+		if (!$desk[0]) {
+			// no desk
+			continue;
+		}
+		var className = classNames[desk.status];
+		if (className) {
+			$desk[0].classList.add(className);
+		}
+	}
+	
+});
+</script>
+
+</body>
+	
+</html>
