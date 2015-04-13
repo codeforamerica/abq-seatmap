@@ -8,7 +8,7 @@
 	<title>ABQ SeatMap</title>
 	
 	<style>
-		svg .desk { fill: white; stroke: black; }
+		svg .desk { fill: white; stroke: black; transition: fill 2s; }
 		svg .desk.available { fill: lightgreen; }
 		svg .desk.occupied  { fill: lightgray; }
 		svg .desk:hover { opacity: 0.5; }
@@ -17,10 +17,15 @@
 
 <body>
 	<object id="office" data="images/office.svg" type="image/svg+xml"></object>
+	<div id="dashboard"></div>
 	
+	<script type="text/template" id="dashboard-template">
+		<ul>
+			<li><%= num_available %> available seats</li>
+			<li><%= num_occupied %> occupied seats</li>
+		</ul>
+	</script>
 	
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-
 <script>
 var SEATS = [
 	{
@@ -64,40 +69,10 @@ var SEATS = [
 ];
 </script>
 
-<script>
-jQuery(window).on('load', function() {
-	var $ = jQuery;
-	var $body = $('body');
-	var $obj = $('#office');
-	var doc = $obj[0].contentDocument;
-	var $svg = $(doc).children('svg');
-	$body.append($svg);
-	$obj.remove();
-	
-	// TODO: find a more compatible way to addClass to svg
-	// http://keith-wood.name/svg.html#dom
-	// https://github.com/toddmotto/lunar
-	
-	var classNames = {
-		"available": "available",
-		"occupied": "occupied"
-	};
-	
-	for (var i=0, l=SEATS.length; i<l; i++) {
-		var desk = SEATS[i];
-		var $desk = $svg.find('#'+desk.id);
-		if (!$desk[0]) {
-			// no desk
-			continue;
-		}
-		var className = classNames[desk.status];
-		if (className) {
-			$desk[0].classList.add(className);
-		}
-	}
-	
-});
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
+<script src="/javascripts/app.js"></script>
 
 </body>
 	
