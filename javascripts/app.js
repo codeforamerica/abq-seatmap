@@ -1,17 +1,24 @@
 (function($) {
+	
+/*
+TODO:
+- better way to select/multiselect a model in a collection
+  https://github.com/derickbailey/backbone.picky
+  https://github.com/hashchange/backbone.select
+*/
 
 var Seat = Backbone.Model.extend({
 	
 });
 
 var SeatCollection = Backbone.Collection.extend({
-	model: Seat
+	model: Seat,
+	selected: null
 });
 
 var SeatMap = Backbone.View.extend({
 	events: {
-		'click .desk': 'onClick',
-		'dblclick .desk': 'onDoubleclick'
+		'click .desk': 'onClick'
 	},
 	
 	initialize: function(options) {
@@ -37,17 +44,31 @@ var SeatMap = Backbone.View.extend({
 		this.render();
 		
 		this.listenTo(this.seats, 'change', this.render);
+		this.listenTo(this.seats, 'hilite', this.hiliteSeats);
+	},
+	
+	hiliteSeats: function(ids) {
+		var seats = this.seats;
+		var $el = this.$el;
+		
+		if (ids && ids.length) {
+			_.each(ids, function(id) {
+				var $seat = $el.find('#'+id);
+				$seat[0].classList.add('hilite');
+			});
+		}
+		else {
+			this.seats.each(function(seat) {
+				var $seat = $el.find('#'+seat.id);
+				$seat[0].classList.remove('hilite');
+			});
+		}
 	},
 	
 	onClick: function(e) {
 		var id = e.target.id;
-		this.showInfo(id);
-	},
-	
-	onDoubleclick: function(e) {
-		var id = e.target.id;
-		var seat = this.seats.get(id);
-		seat.set('status', 'occupied');
+		this.seats.selected = id;
+		this.seats.trigger('selected', id);
 	},
 	
 	render: function() {
@@ -76,22 +97,40 @@ var SeatMap = Backbone.View.extend({
 		});
 		
 		return this;
-	},
-	
-	showInfo: function(id) {
-		var seat = this.seats.get(id);
-		var status = seat.get('status');
-		console.log(status);
 	}
 });
 
 var SeatDashboard = Backbone.View.extend({
+	events: {
+		'mouseenter .seat-legend.available': 'hiliteAvailableSeats',
+		'mouseenter .seat-legend.occupied': 'hiliteOccupiedSeats',
+		'mouseleave .seat-legend': 'hiliteNone'
+	},
+	
 	initialize: function(options) {
 		this.seats = options.seats;
 		
 		this.listenTo(this.seats, 'change', this.render);
 		
 		this.render();
+	},
+	
+	hiliteAvailableSeats: function() {
+		this.hiliteSeatsWhere({status: 'available'});
+	},
+	
+	hiliteOccupiedSeats: function() {
+		this.hiliteSeatsWhere({status: 'occupied'});
+	},
+	
+	hiliteSeatsWhere: function(attrs) {
+		var seats = this.seats.where(attrs);
+		var ids = _.pluck(seats, 'id');
+		this.seats.trigger('hilite', ids);
+	},
+	
+	hiliteNone: function() {
+		this.seats.trigger('hilite', []);
 	},
 	
 	render: function() {
@@ -105,6 +144,48 @@ var SeatDashboard = Backbone.View.extend({
 		});
 		this.$el.html(html);
 		return this;
+	}
+});
+
+var SeatDetails = Backbone.View.extend({
+	events: {
+		'click .seat-reserve': 'reserve'
+	},
+	
+	initialize: function(options) {
+		this.seats = options.seats;
+		
+		this.listenTo(this.seats, 'selected', this.render);
+		
+		this.render(this.seats.selected);
+	},
+	
+	render: function(id) {
+		var seat = this.seats.get(id);
+		if (!seat) {
+			return;
+		}
+		
+		var template = _.template($('#seat-details-template').html());
+		var html = template({
+			id: id,
+			cost: seat.get('cost'),
+			status: seat.get('status')
+		});
+		this.$el.html(html);
+		return this;
+	},
+	
+	reserve: function() {
+		var id = this.seats.selected;
+		var seat = this.seats.get(id);
+		if (!seat) {
+			return;
+		}
+		seat.set('status', 'occupied');
+		
+		// re-render this view
+		this.render(id);
 	}
 });
 
@@ -124,6 +205,11 @@ var SeatMapApp = Backbone.View.extend({
 			
 			dashboard: new SeatDashboard({
 				el: this.$('#dashboard')[0],
+				seats: this.collections.seats
+			}),
+			
+			seatdetails: new SeatDetails({
+				el: this.$('#seat-details')[0],
 				seats: this.collections.seats
 			})
 		};

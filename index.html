@@ -8,22 +8,52 @@
 	<title>ABQ SeatMap</title>
 	
 	<style>
-		svg .desk { fill: white; stroke: black; transition: fill 2s; }
+		svg .desk { fill: white; stroke: black; transition: fill 1s; }
 		svg .desk.available { fill: lightgreen; }
-		svg .desk.occupied  { fill: lightgray; }
+		svg .desk.occupied { fill: lightgray; }
 		svg .desk:hover { opacity: 0.5; }
+		svg .desk.hilite { stroke-dasharray: 1px; stroke-width: 0.6px; -webkit-animation: dash 5s linear; }
+		
+		@-webkit-keyframes dash {
+			from {
+				stroke-dashoffset: 0;
+			}
+			to {
+				stroke-dashoffset: 10;
+			}
+		}
+		
+		.seat-legend { list-style-type: none; margin: 0; padding: 0; }
+		.seat-legend:before { content: ' '; width: 10px; height: 10px; border: 1px solid black; display: block; float: left; margin-right: 5px; }
+		.seat-legend.available:before { background-color: lightgreen; }
+		.seat-legend.occupied:before { background-color: lightgray; }
 	</style>
 </head>
 
 <body>
 	<object id="office" data="images/office.svg" type="image/svg+xml"></object>
 	<div id="dashboard"></div>
+	<div id="seat-details"></div>
 	
 	<script type="text/template" id="dashboard-template">
-		<ul>
-			<li><%= num_available %> available seats</li>
-			<li><%= num_occupied %> occupied seats</li>
+		<ul class="seat-legends">
+			<li class="seat-legend available"><%- num_available %> available seats</li>
+			<li class="seat-legend occupied"><%- num_occupied %> occupied seats</li>
 		</ul>
+	</script>
+	
+	<script type="text/template" id="seat-details-template">
+		<ul class="seat-details">
+			<li><%- id %></li>
+			<li>$<%- cost %>/mo.</li>
+			<li>
+				<%- status %>
+				<% if (status=="available") { %>
+					<input type="button" class="seat-reserve" value="Reserve" />
+				<% } %>
+			</li>
+		</ul>
+		
 	</script>
 	
 <script>
