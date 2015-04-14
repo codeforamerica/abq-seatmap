@@ -1,3 +1,5 @@
+---
+---
 <!DOCTYPE html>
 <html>
 <head>
@@ -31,7 +33,7 @@
 </head>
 
 <body>
-	<object id="office" data="images/office.svg" type="image/svg+xml"></object>
+	<object id="office" data="{{ site.baseurl }}/images/office.svg" type="image/svg+xml"></object>
 	<div id="dashboard"></div>
 	<div id="seat-details"></div>
 	
@@ -102,7 +104,7 @@ var SEATS = [
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
-<script src="/javascripts/app.js"></script>
+<script src="{{ site.baseurl }}/javascripts/app.js"></script>
 
 </body>
 	
