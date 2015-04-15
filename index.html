@@ -10,7 +10,7 @@
 	<title>ABQ SeatMap</title>
 	
 	<style>
-		svg .desk { fill: white; stroke: black; transition: fill 1s; }
+		svg .desk { fill: white; stroke: black; transition: fill 1s; cursor: pointer; }
 		svg .desk.available { fill: lightgreen; }
 		svg .desk.occupied { fill: lightgray; }
 		svg .desk:hover { opacity: 0.5; }
@@ -46,11 +46,12 @@
 	
 	<script type="text/template" id="seat-details-template">
 		<ul class="seat-details">
-			<li><%- id %></li>
-			<li>$<%- cost %>/mo.</li>
+			<li><%- seat.id %></li>
+			<li>Type: Desk</li>
+			<li>Cost: $<%- seat.cost %>/mo.</li>
 			<li>
-				<%- status %>
-				<% if (status=="available") { %>
+				<%- seat.status %>
+				<% if (seat.status=="available") { %>
 					<input type="button" class="seat-reserve" value="Reserve" />
 				<% } %>
 			</li>

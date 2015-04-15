@@ -168,9 +168,7 @@ var SeatDetails = Backbone.View.extend({
 		
 		var template = _.template($('#seat-details-template').html());
 		var html = template({
-			id: id,
-			cost: seat.get('cost'),
-			status: seat.get('status')
+			seat: seat.toJSON()
 		});
 		this.$el.html(html);
 		return this;
@@ -182,10 +180,13 @@ var SeatDetails = Backbone.View.extend({
 		if (!seat) {
 			return;
 		}
-		seat.set('status', 'occupied');
+		var confirmed = window.confirm("Reserve this seat for the price shown?");
+		if (confirmed) {
+			seat.set('status', 'occupied');
 		
-		// re-render this view
-		this.render(id);
+			// re-render this view
+			this.render(id);
+		}
 	}
 });
 
